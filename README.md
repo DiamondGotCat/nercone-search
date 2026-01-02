@@ -1,2 +1,2 @@
 # nercone-search
-In Development: My own Search Engine
+自作検索エンジン
