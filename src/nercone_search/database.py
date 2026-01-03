@@ -103,7 +103,15 @@ def search(tensor: torch.Tensor | None = None, nums: int = 50) -> list[str]:
     embedding_list = tensor.tolist()
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"SELECT id FROM {DatabaseTableName} ORDER BY embedding <=> %s LIMIT %s;", (embedding_list, nums))
+            cur.execute(
+                f"""
+                SELECT id
+                FROM {DatabaseTableName}
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s;
+                """,
+                (embedding_list, nums)
+            )
             results = cur.fetchall()
             return [str(row[0]) for row in results]
 
