@@ -107,7 +107,7 @@ def get(id: str) -> dict:
     try:
         uuid.UUID(id)
     except ValueError:
-        return {"url": "", "title": "", "description": "", "markdown": "", "keywords": []}
+        return {"id": id, "url": "", "title": "", "description": "", "markdown": "", "keywords": []}
 
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -122,4 +122,4 @@ def get(id: str) -> dict:
                     "keywords": result[4]
                 }
             else:
-                return {"url": "", "title": "", "description": "", "markdown": "", "keywords": []}
+                return {"id": id, "url": "", "title": "", "description": "", "markdown": "", "keywords": []}

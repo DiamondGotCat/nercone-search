@@ -10,11 +10,13 @@ import urllib.robotparser
 from bs4 import BeautifulSoup
 from markitdown import MarkItDown
 from cachetools import TTLCache, cached
+from nercone_modern.logging import ModernLogging
 from .embed import embed
 from .database import append
 from .config import CrawlerName, CrawlerVersion, CrawlerAdditionalInformations, CrawlerRobotsCacheTTL, CrawlerRobotsCacheSize
 
 md = MarkItDown()
+logger = ModernLogging(process_name="Crawler")
 robots_cache = TTLCache(maxsize=CrawlerRobotsCacheSize, ttl=CrawlerRobotsCacheTTL)
 
 @cached(robots_cache)
@@ -34,7 +36,10 @@ def can_fetch(url: str) -> bool:
     parser.parse(robots_txt)
     return parser.can_fetch(f"{CrawlerName}/{CrawlerVersion}", url)
 
-def crawl(url: str, disallow_ok: bool = False):
+def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_crawled_links: list[str] = []):
+    if url in already_crawled_links:
+        return
+    already_crawled_links.append(url)
     if can_fetch(url):
         response = requests.get(url, headers={"User-Agent": f"{CrawlerName}/{CrawlerVersion} ({', '.join(CrawlerAdditionalInformations)})"}, allow_redirects=True)
         if str(response.status_code).startswith("2"):
@@ -50,5 +55,18 @@ def crawl(url: str, disallow_ok: bool = False):
                     keywords_text = keywords_tag["content"].strip() if keywords_tag and keywords_tag.has_attr("content") else ""
                     keywords = list(map(str.strip, keywords_text.split(",")))
                     append(url=url, title=title, description=description, markdown=content_md, keywords=keywords, tensor=embed(content_md))
-    elif not disallow_ok:
-        raise Exception(f"Cannot fetch '{url}' because Disallowed in robots.txt")
+                    logger.log(f"Crawled '{url}'")
+                    if recursive:
+                        links = []
+                        for a in bs.find_all("a", href=True):
+                            href = a["href"]
+                            if isinstance(href, str) and href.startswith(("http://", "https://", "/")):
+                                links.append(href)
+                        logger.log(f"Found {len(links)} links.")
+                        for link in links:
+                            crawl(link, recursive=recursive, disallow_ok=disallow_ok)
+    else:
+        if disallow_ok:
+            logger.log(f"Disallowed in robots.txt: '{url}'", "WARN")
+        else:
+            raise Exception(f"Cannot fetch '{url}' because Disallowed in robots.txt")

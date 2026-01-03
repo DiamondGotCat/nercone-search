@@ -19,6 +19,7 @@ DatabasePassword = "password"
 # Embedding
 EmbeddingModel = "Qwen/Qwen3-Embedding-0.6B"
 EmbeddingDimension = 1024
+EmbeddingCacheSize = 32
 
 # Crawler
 CrawlerName = "NerconeBot"
