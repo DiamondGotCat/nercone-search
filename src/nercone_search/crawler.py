@@ -47,7 +47,7 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
             if response.headers.get("Content-Type", "unknown").lower().startswith("text/"):
                 content = response.text
                 content_md = md.convert(response).markdown
-                if response.headers.get("Content-Type", "unknown").lower() == "text/html":
+                if response.headers.get("Content-Type", "unknown").lower().startswith("text/html"):
                     bs = BeautifulSoup(content, "html.parser")
                     title = bs.title.string.strip() if bs.title and bs.title.string else "No Title"
                     description_tag = bs.find("meta", attrs={"name": "description"})
