@@ -22,7 +22,6 @@ def get_connection():
             user=DatabaseUser,
             password=DatabasePassword
         )
-        register_vector(conn)
         yield conn
     finally:
         if conn:
@@ -31,6 +30,11 @@ def get_connection():
 def initialize(exist_ok: bool = True):
     with get_connection() as conn:
         with conn.cursor() as cur:
+            cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+            conn.commit()
+
+            register_vector(conn)
+
             cur.execute(f"SELECT to_regclass('{DatabaseTableName}');")
             table_exists = cur.fetchone()[0] is not None
 
