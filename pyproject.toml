@@ -16,6 +16,7 @@ dependencies = [
     "rich",
     "nercone-modern",
     "fastapi",
+    "uvicorn",
     "requests",
     "markitdown",
     "cachetools",

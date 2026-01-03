@@ -1,3 +1,9 @@
+# ┌─────────────────────────────────────────┐
+# │ __main__.py on Nercone Search           │
+# │ Copyright (c) 2026 DiamondGotCat        │
+# │ Made by Nercone / MIT License           │
+# └─────────────────────────────────────────┘
+
 import argparse
 from .config import ProductName
 from .api import serve
