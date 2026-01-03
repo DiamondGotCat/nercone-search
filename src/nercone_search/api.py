@@ -1,3 +1,9 @@
+# ┌─────────────────────────────────────────┐
+# │ api.py on Nercone Search                │
+# │ Copyright (c) 2026 DiamondGotCat        │
+# │ Made by Nercone / MIT License           │
+# └─────────────────────────────────────────┘
+
 import uvicorn
 import multiprocessing
 from fastapi import FastAPI, Request
