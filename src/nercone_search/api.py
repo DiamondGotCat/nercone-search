@@ -1,3 +1,5 @@
+import uvicorn
+import multiprocessing
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from nercone_modern.logging import ModernLogging
@@ -6,7 +8,7 @@ from .embed import embed
 from .database import search, get
 
 app = FastAPI()
-logger = ModernLogging(process_name="API")
+logger = ModernLogging(process_name="API Server")
 
 @app.api_route("/api/v1/status", methods=["GET"])
 async def v1_status(request: Request):
@@ -51,3 +53,12 @@ async def v1_search(request: Request):
     if id == "":
         return JSONResponse({"status": "error", "description": "'id'ヘッダーに渡された文字列が空です。取得したい項目のIDを'id'ヘッダーに渡す必要があります。"}, status_code=400)
     return JSONResponse({"status": "ok", "result": get(id)}, status_code=200)
+
+def serve():
+    logger.log("Nercone Search API Server Started.")
+    cores_count = multiprocessing.cpu_count()
+    logger.log(f"CPU Core Count: {cores_count} Core(s)")
+    workers_count = cores_count*2
+    logger.log(f"Starting with {workers_count} workers.")
+    uvicorn.run("__main__:app", host="0.0.0.0", port=8081, log_level="error", workers=workers_count, server_header=False)
+    logger.log("Nercone Search API Server Stopped.")

@@ -1,5 +1,6 @@
 import argparse
 from .config import ProductName
+from .api import serve
 from .crawler import crawl
 from .embed import embed
 from .database import initialize, search
@@ -16,6 +17,9 @@ def str_to_bool(v):
 def _cmd_init(ns: argparse.Namespace):
     initialize(exist_ok=ns.exist_ok)
 
+def _cmd_serve(ns: argparse.Namespace):
+    serve()
+
 def _cmd_crawl(ns: argparse.Namespace):
     crawl(url=ns.url, recursive=ns.recursive, disallow_ok=ns.disallow_ok)
 
@@ -29,6 +33,9 @@ def main():
     cmd_init = subparser.add_parser("init", help="データーベースを初期化")
     cmd_init.add_argument("exist_ok", type=str_to_bool, default=True, help="既に必要なテーブルが存在する場合にスキップするかどうか")
     cmd_init.set_defaults(func=_cmd_init)
+
+    cmd_serve = subparser.add_parser("serve", help="APIサーバーを起動")
+    cmd_serve.set_defaults(func=_cmd_serve)
 
     cmd_crawl = subparser.add_parser("crawl", help="指定したサイトをクロール")
     cmd_crawl.add_argument("url", type=str, required=True, help="クロールするページのURL")
