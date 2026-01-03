@@ -18,27 +18,6 @@ from .database import initialize, search, get
 app = FastAPI()
 logger = ModernLogging(process_name="Nercone Search")
 
-def str_to_bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ("true", "t", "yes", "y", "1"):
-        return True
-    if v.lower() in ("false", "f", "no", "n", "0"):
-        return False
-    raise argparse.ArgumentTypeError("Boolean value expected")
-
-def _cmd_init(ns: argparse.Namespace):
-    initialize(exist_ok=ns.exist_ok)
-
-def _cmd_serve(ns: argparse.Namespace):
-    serve()
-
-def _cmd_crawl(ns: argparse.Namespace):
-    crawl(url=ns.url, recursive=ns.recursive, disallow_ok=ns.disallow_ok)
-
-def _cmd_search(ns: argparse.Namespace):
-    print(list(map(get, search(embed(ns.query), nums=ns.nums))))
-
 @app.api_route("/api/v1/status", methods=["GET"])
 async def v1_status(request: Request):
     return JSONResponse(
@@ -91,6 +70,27 @@ def serve():
     logger.log(f"Starting with {workers_count} workers.")
     uvicorn.run("__main__:app", host="0.0.0.0", port=8081, log_level="error", workers=workers_count, server_header=False)
     logger.log("Nercone Search API Server Stopped.")
+
+def str_to_bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("true", "t", "yes", "y", "1"):
+        return True
+    if v.lower() in ("false", "f", "no", "n", "0"):
+        return False
+    raise argparse.ArgumentTypeError("Boolean value expected")
+
+def _cmd_init(ns: argparse.Namespace):
+    initialize(exist_ok=ns.exist_ok)
+
+def _cmd_serve(ns: argparse.Namespace):
+    serve()
+
+def _cmd_crawl(ns: argparse.Namespace):
+    crawl(url=ns.url, recursive=ns.recursive, disallow_ok=ns.disallow_ok)
+
+def _cmd_search(ns: argparse.Namespace):
+    print(list(map(get, search(embed(ns.query), nums=ns.nums))))
 
 def main():
     parser = argparse.ArgumentParser(prog=ProductName)
