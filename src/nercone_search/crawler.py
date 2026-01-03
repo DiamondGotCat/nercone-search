@@ -41,6 +41,7 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
         return
     already_crawled_links.append(url)
     if can_fetch(url):
+        logger.log(f"Crawling '{url}'")
         response = requests.get(url, headers={"User-Agent": f"{CrawlerName}/{CrawlerVersion} ({', '.join(CrawlerAdditionalInformations)})"}, allow_redirects=True)
         if str(response.status_code).startswith("2"):
             if response.headers.get("Content-Type", "unknown").lower().startswith("text/"):
@@ -66,6 +67,12 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
                         logger.log(f"Found {len(links)} links.")
                         for link in links:
                             crawl(link, recursive=recursive, disallow_ok=disallow_ok, already_crawled_links=already_crawled_links)
+                else:
+                    logger.log(f"Not HTML: '{url}'")
+            else:
+                logger.log(f"Not Text: '{url}'")
+        else:
+            logger.log(f"Status code {response.status_code}: '{url}'")
     else:
         if disallow_ok:
             logger.log(f"Disallowed in robots.txt: '{url}'", "WARN")
