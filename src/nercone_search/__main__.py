@@ -9,7 +9,7 @@ from .config import ProductName
 from .api import serve
 from .crawler import crawl
 from .embed import embed
-from .database import initialize, search
+from .database import initialize, search, get
 
 def str_to_bool(v):
     if isinstance(v, bool):
@@ -30,7 +30,7 @@ def _cmd_crawl(ns: argparse.Namespace):
     crawl(url=ns.url, recursive=ns.recursive, disallow_ok=ns.disallow_ok)
 
 def _cmd_search(ns: argparse.Namespace):
-    search(embed(ns.query), nums=ns.nums)
+    print(list(map(get, search(embed(ns.query), nums=ns.nums))))
 
 def main():
     parser = argparse.ArgumentParser(prog=ProductName)
