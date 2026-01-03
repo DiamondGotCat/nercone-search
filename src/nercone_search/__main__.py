@@ -54,5 +54,8 @@ def main():
     cmd_search.add_argument("nums", type=int, default=50, help="検索結果数の上限")
     cmd_search.set_defaults(func=_cmd_search)
 
+    args = parser.parse_args()
+    args.func(args)
+
 if __name__ == "__main__":
     main()
