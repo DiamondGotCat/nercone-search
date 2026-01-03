@@ -50,7 +50,7 @@ def main():
     cmd_crawl.set_defaults(func=_cmd_crawl)
 
     cmd_search = subparser.add_parser("search", help="キーワードから検索")
-    cmd_search.add_argument("query", type=str, required=True, help="クエリ")
+    cmd_search.add_argument("query", type=str, help="クエリ")
     cmd_search.add_argument("nums", type=int, default=50, help="検索結果数の上限")
     cmd_search.set_defaults(func=_cmd_search)
 
