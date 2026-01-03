@@ -44,7 +44,7 @@ def main():
     cmd_serve.set_defaults(func=_cmd_serve)
 
     cmd_crawl = subparser.add_parser("crawl", help="指定したサイトをクロール")
-    cmd_crawl.add_argument("url", type=str, required=True, help="クロールするページのURL")
+    cmd_crawl.add_argument("url", type=str, help="クロールするページのURL")
     cmd_crawl.add_argument("recursive", type=str_to_bool, default=True, help="サイト内にあるリンクをさらにクロールするかどうか")
     cmd_crawl.add_argument("disallow_ok", type=str_to_bool, default=True, help="robots.txtで拒否された場合に例外を発生させないかどうか")
     cmd_crawl.set_defaults(func=_cmd_crawl)
