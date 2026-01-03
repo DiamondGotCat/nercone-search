@@ -61,10 +61,11 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
                         for a in bs.find_all("a", href=True):
                             href = a["href"]
                             if isinstance(href, str) and href.startswith(("http://", "https://", "/")):
-                                links.append(href)
+                                links.append(urllib.parse.urljoin(url, href))
+                        links = list(set(links))
                         logger.log(f"Found {len(links)} links.")
                         for link in links:
-                            crawl(link, recursive=recursive, disallow_ok=disallow_ok)
+                            crawl(link, recursive=recursive, disallow_ok=disallow_ok, already_crawled_links=already_crawled_links)
     else:
         if disallow_ok:
             logger.log(f"Disallowed in robots.txt: '{url}'", "WARN")
