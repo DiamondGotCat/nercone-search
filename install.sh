@@ -4,6 +4,4 @@
 # │ Made by Nercone / MIT License           │
 # └─────────────────────────────────────────┘
 
-uv venv
-source .venv/bin/activate
-uv pip install .
+uv tool install .
