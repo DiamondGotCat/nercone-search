@@ -55,8 +55,8 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
                     keywords_tag = bs.find("meta", attrs={"name": "keywords"})
                     keywords_text = keywords_tag["content"].strip() if keywords_tag and keywords_tag.has_attr("content") else ""
                     keywords = list(map(str.strip, keywords_text.split(",")))
-                    append(url=url, title=title, description=description, markdown=content_md, keywords=keywords, tensor=embed(content_md))
-                    logger.log(f"Crawled '{url}'")
+                    append(url=url, title=title, description=description, markdown=content_md, keywords=keywords, tensor=embed(f"Title: {title}\nDescription: {description}\nKeywords: {', '.join(keywords)}\n\n{content_md}"))
+                    logger.log(f"Crawled {title}('{url}')")
                     if recursive:
                         links = []
                         for a in bs.find_all("a", href=True):
@@ -68,13 +68,13 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
                         for link in links:
                             crawl(link, recursive=recursive, disallow_ok=disallow_ok, already_crawled_links=already_crawled_links)
                 else:
-                    logger.log(f"Not HTML: '{url}'")
+                    logger.log(f"Not HTML: '{url}'", "ERROR")
             else:
-                logger.log(f"Not Text: '{url}'")
+                logger.log(f"Not Text: '{url}'", "ERROR")
         else:
-            logger.log(f"Status code {response.status_code}: '{url}'")
+            logger.log(f"Status code {response.status_code}: '{url}'", "ERROR")
     else:
         if disallow_ok:
-            logger.log(f"Disallowed in robots.txt: '{url}'", "WARN")
+            logger.log(f"Disallowed in robots.txt: '{url}'", "ERROR")
         else:
             raise Exception(f"Cannot fetch '{url}' because Disallowed in robots.txt")

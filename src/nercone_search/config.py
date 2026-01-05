@@ -17,9 +17,9 @@ DatabaseUser = "nercone-search"
 DatabasePassword = "password"
 
 # Embedding
-EmbeddingModel = "Qwen/Qwen3-Embedding-0.6B"
-EmbeddingDimension = 1024
-EmbeddingCacheSize = 32
+EmbeddingModel = "google/embeddinggemma-300m"
+EmbeddingDimension = 768
+EmbeddingCacheSize = 0
 
 # Crawler
 CrawlerName = "NerconeBot"
