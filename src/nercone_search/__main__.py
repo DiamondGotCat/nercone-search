@@ -7,7 +7,7 @@
 import argparse
 from nercone_modern.logging import ModernLogging
 from .embed import embed
-from .config import *
+from .config import config
 from .embed import embed
 from .server import serve
 from .crawler import crawl
@@ -37,7 +37,7 @@ def _cmd_search(ns: argparse.Namespace):
     print(list(map(get, search(embed(ns.query), nums=ns.nums))))
 
 def main():
-    parser = argparse.ArgumentParser(prog=ProductName)
+    parser = argparse.ArgumentParser(prog="nerconesearch")
     subparser = parser.add_subparsers(dest="command", required=True)
 
     cmd_init = subparser.add_parser("init", help="データーベースを初期化")

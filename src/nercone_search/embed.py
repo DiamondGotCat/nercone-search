@@ -7,10 +7,10 @@
 import torch
 from functools import lru_cache
 from sentence_transformers import SentenceTransformer
-from .config import EmbeddingModel, EmbeddingCacheSize
+from .config import config
 
-model = SentenceTransformer(EmbeddingModel)
+model = SentenceTransformer(config.get("EmbeddingModel"))
 
-@lru_cache(maxsize=EmbeddingCacheSize)
+@lru_cache(maxsize=config.get("EmbeddingCacheSize"))
 def embed(text: str) -> torch.Tensor:
     return model.encode(text, normalize_embeddings=True)

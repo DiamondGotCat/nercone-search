@@ -13,15 +13,15 @@ from cachetools import TTLCache, cached
 from nercone_modern.logging import ModernLogging
 from .embed import embed
 from .database import append
-from .config import CrawlerName, CrawlerVersion, CrawlerAdditionalInformations, CrawlerRobotsCacheTTL, CrawlerRobotsCacheSize
+from .config import config
 
 md = MarkItDown()
 logger = ModernLogging(process_name="Crawler")
-robots_cache = TTLCache(maxsize=CrawlerRobotsCacheSize, ttl=CrawlerRobotsCacheTTL)
+robots_cache = TTLCache(maxsize=config.get("CrawlerRobotsCacheSize"), ttl=config.get("CrawlerRobotsCacheTTL"))
 
 @cached(robots_cache)
 def fetch_robots(url: str) -> str:
-    response = requests.get(url, headers={"User-Agent": f"{CrawlerName}/{CrawlerVersion} ({', '.join(CrawlerAdditionalInformations)})"}, allow_redirects=True)
+    response = requests.get(url, headers={"User-Agent": f"{config.get('CrawlerName')}/{config.get('CrawlerVersion')} ({', '.join(config.get('CrawlerAdditionalInformations'))})"}, allow_redirects=True) # type: ignore
     if str(response.status_code).startswith("2"):
         return response.text
     else:
@@ -34,7 +34,7 @@ def can_fetch(url: str) -> bool:
     parser = urllib.robotparser.RobotFileParser()
     parser.set_url(robots_url)
     parser.parse(robots_txt)
-    return parser.can_fetch(f"{CrawlerName}/{CrawlerVersion}", url)
+    return parser.can_fetch(f"{config.get('CrawlerName')}/{config.get('CrawlerVersion')}", url)
 
 def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_crawled_links: list[str] = []):
     if url in already_crawled_links:
@@ -42,7 +42,7 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
     already_crawled_links.append(url)
     if can_fetch(url):
         logger.log(f"Crawling '{url}'")
-        response = requests.get(url, headers={"User-Agent": f"{CrawlerName}/{CrawlerVersion} ({', '.join(CrawlerAdditionalInformations)})"}, allow_redirects=True)
+        response = requests.get(url, headers={"User-Agent": f"{config.get('CrawlerName')}/{config.get('CrawlerVersion')} ({', '.join(config.get('CrawlerAdditionalInformations'))})"}, allow_redirects=True) # type: ignore
         if str(response.status_code).startswith("2"):
             if response.headers.get("Content-Type", "unknown").lower().startswith("text/"):
                 content = response.text

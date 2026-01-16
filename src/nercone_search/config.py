@@ -4,26 +4,10 @@
 # │ Made by Nercone / MIT License           │
 # └─────────────────────────────────────────┘
 
-# General
-ProductName = "Nercone Search"
-ProductIdentifier = "net.diamondgotcat.search"
+import toml
+from pathlib import Path
 
-# Database
-DatabaseHost = "localhost"
-DatabasePort = 5432
-DatabaseName = "nercone-search"
-DatabaseTableName = "pages"
-DatabaseUser = "nercone-search"
-DatabasePassword = "password"
-
-# Embedding
-EmbeddingModel = "google/embeddinggemma-300m"
-EmbeddingDimension = 768
-EmbeddingCacheSize = 0
-
-# Crawler
-CrawlerName = "NerconeBot"
-CrawlerVersion = "1.0.0"
-CrawlerAdditionalInformations = ["Made by Nercone <nercone@diamondgotcat.net>", "https://github.com/DiamondGotCat/nercone-search/"]
-CrawlerRobotsCacheTTL = 2592000
-CrawlerRobotsCacheSize = 128
+filepath = Path.cwd().joinpath("config.toml")
+if filepath.is_file():
+    with filepath.open("r") as f:
+        config: dict = toml.load(f)

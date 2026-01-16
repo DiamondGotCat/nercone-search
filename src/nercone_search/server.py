@@ -1,10 +1,17 @@
+# ┌─────────────────────────────────────────┐
+# │ server.py on Nercone Search             │
+# │ Copyright (c) 2026 DiamondGotCat        │
+# │ Made by Nercone / MIT License           │
+# └─────────────────────────────────────────┘
+
+import psutil
 import uvicorn
 import multiprocessing
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from nercone_modern.logging import ModernLogging
 from .embed import embed
-from .config import *
+from .config import config
 from .database import search, get
 
 app = FastAPI()
@@ -12,19 +19,33 @@ logger = ModernLogging(process_name="Server")
 
 @app.api_route("/api/v1/status", methods=["GET"])
 async def v1_status(request: Request):
+    memory = psutil.virtual_memory()
+    storage = psutil.disk_usage('/')
     return JSONResponse(
         {
             "status": "ok",
-            "config": {
-                "ProductName": ProductName,
-                "ProductIdentifier": ProductIdentifier,
-                "EmbeddingModel": EmbeddingModel,
-                "EmbeddingDimension": EmbeddingDimension,
-                "CrawlerName": CrawlerName,
-                "CrawlerVersion": CrawlerVersion,
-                "CrawlerAdditionalInformations": CrawlerAdditionalInformations,
-                "CrawlerRobotsCacheTTL": CrawlerRobotsCacheTTL,
-                "CrawlerRobotsCacheSize": CrawlerRobotsCacheSize
+            "config": config,
+            "resource": {
+                "cpu": {
+                    "count": psutil.cpu_count(),
+                    "usage": psutil.cpu_percent(interval=1)
+                },
+                "memory": {
+                    "total": memory.total,
+                    "usage": {
+                        "percent": memory.percent,
+                        "used": memory.used,
+                        "available": memory.available
+                    }
+                },
+                "storage": {
+                    "total": storage.total,
+                    "usage": {
+                        "percent": storage.percent,
+                        "used": storage.used,
+                        "available": storage.free
+                    }
+                }
             }
         },
         status_code=200

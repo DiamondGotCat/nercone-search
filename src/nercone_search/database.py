@@ -9,18 +9,18 @@ import torch
 import psycopg2
 from pgvector.psycopg2 import register_vector
 from contextlib import contextmanager
-from .config import EmbeddingDimension, DatabaseHost, DatabasePort, DatabaseName, DatabaseTableName, DatabaseUser, DatabasePassword
+from .config import config
 
 @contextmanager
 def get_connection():
     conn = None
     try:
         conn = psycopg2.connect(
-            dbname=DatabaseName,
-            host=DatabaseHost,
-            port=DatabasePort,
-            user=DatabaseUser,
-            password=DatabasePassword
+            dbname=config.get("DatabaseName"),
+            host=config.get("DatabaseHost"),
+            port=config.get("DatabasePort"),
+            user=config.get("DatabaseUser"),
+            password=config.get("DatabasePassword")
         )
         yield conn
     finally:
@@ -35,26 +35,26 @@ def initialize(exist_ok: bool = True):
 
             register_vector(conn)
 
-            cur.execute(f"SELECT to_regclass('{DatabaseTableName}');")
+            cur.execute(f"SELECT to_regclass('{config.get('DatabaseTableName')}');")
             table_exists = cur.fetchone()[0] is not None
 
             if table_exists:
                 if not exist_ok:
-                    raise FileExistsError(f"Table '{DatabaseTableName}' already exists.")
+                    raise FileExistsError(f"Table '{config.get('DatabaseTableName')}' already exists.")
                 else:
                     return
 
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
 
             cur.execute(f"""
-                CREATE TABLE {DatabaseTableName} (
+                CREATE TABLE {config.get('DatabaseTableName')} (
                     id UUID PRIMARY KEY,
                     url TEXT UNIQUE NOT NULL,
                     title TEXT,
                     description TEXT,
                     markdown TEXT,
                     keywords TEXT[],
-                    embedding vector({EmbeddingDimension}),
+                    embedding vector({config.get('EmbeddingDimension')}),
                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
@@ -70,9 +70,9 @@ def initialize(exist_ok: bool = True):
                 $$ LANGUAGE plpgsql;
             """)
             cur.execute(f"""
-                DROP TRIGGER IF EXISTS set_timestamp ON {DatabaseTableName};
+                DROP TRIGGER IF EXISTS set_timestamp ON {config.get('DatabaseTableName')};
                 CREATE TRIGGER set_timestamp
-                BEFORE UPDATE ON {DatabaseTableName}
+                BEFORE UPDATE ON {config.get('DatabaseTableName')}
                 FOR EACH ROW
                 EXECUTE FUNCTION trigger_set_timestamp();
             """)
@@ -84,7 +84,7 @@ def append(url: str, title: str = "No Title", description: str = "No description
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(f"""
-                INSERT INTO {DatabaseTableName} (id, url, title, description, markdown, keywords, embedding)
+                INSERT INTO {config.get('DatabaseTableName')} (id, url, title, description, markdown, keywords, embedding)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (url)
                 DO UPDATE SET
@@ -106,7 +106,7 @@ def search(tensor: torch.Tensor | None = None, nums: int = 50) -> list[str]:
             cur.execute(
                 f"""
                 SELECT id
-                FROM {DatabaseTableName}
+                FROM {config.get('DatabaseTableName')}
                 ORDER BY embedding <=> %s::vector
                 LIMIT %s;
                 """,
@@ -123,7 +123,7 @@ def get(id: str) -> dict:
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"SELECT url, title, description, markdown, keywords FROM {DatabaseTableName} WHERE id = %s;", (id,))
+            cur.execute(f"SELECT url, title, description, markdown, keywords FROM {config.get('DatabaseTableName')} WHERE id = %s;", (id,))
             result = cur.fetchone()
             if result:
                 return {
