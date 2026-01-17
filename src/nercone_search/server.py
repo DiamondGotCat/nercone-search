@@ -24,7 +24,6 @@ async def v1_status(request: Request):
     return JSONResponse(
         {
             "status": "ok",
-            "config": config,
             "resource": {
                 "cpu": {
                     "count": psutil.cpu_count(),
