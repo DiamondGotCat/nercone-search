@@ -17,6 +17,7 @@ DatabaseUser = "nercone-search"
 DatabasePassword = "password"
 
 # Embedding
+EmbeddingEnabled = false
 EmbeddingModel = "google/embeddinggemma-300m"
 EmbeddingDimension = 768
 EmbeddingCacheSize = 0

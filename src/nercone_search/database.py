@@ -96,7 +96,11 @@ def append(url: str, title: str = "No Title", description: str = "No description
             """, (str(uuid.uuid4()), url, title, description, markdown, keywords, embedding_list))
             conn.commit()
 
-def search(tensor: torch.Tensor | None = None, nums: int = 50) -> list[str]:
+# TODO: 全文検索
+def search_fulltext(keyword: str, nums: int = 50) -> list[str]:
+    return []
+
+def search_vector(tensor: torch.Tensor | None = None, nums: int = 50) -> list[str]:
     if tensor is None:
         return []
 

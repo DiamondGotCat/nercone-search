@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from nercone_modern.logging import ModernLogging
 from .embed import embed
 from .config import config
-from .database import search, get
+from .database import search_vector, get
 
 app = FastAPI()
 logger = ModernLogging(process_name="Server")
@@ -61,7 +61,7 @@ async def v1_search(request: Request):
         nums = int(request.headers.get("nums", "50"))
     except ValueError:
         return JSONResponse({"status": "error", "description": "'nums'ヘッダーに渡された値が数値ではありません。値は10進数の半角アラビア数字でなければなりません。"}, status_code=400)
-    result_ids = search(embed(query), nums=nums)
+    result_ids = search_vector(embed(query), nums=nums)
     result = list(map(get, result_ids))
     return JSONResponse({"status": "ok", "result": result}, status_code=200)
 

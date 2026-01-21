@@ -11,7 +11,7 @@ from .config import config
 from .embed import embed
 from .server import serve
 from .crawler import crawl
-from .database import initialize, search, get
+from .database import initialize, search_vector, get
 
 logger = ModernLogging(process_name="Nercone Search")
 
@@ -34,7 +34,7 @@ def _cmd_crawl(ns: argparse.Namespace):
     crawl(url=ns.url, recursive=ns.recursive, disallow_ok=ns.disallow_ok)
 
 def _cmd_search(ns: argparse.Namespace):
-    print(list(map(get, search(embed(ns.query), nums=ns.nums))))
+    print(list(map(get, search_vector(embed(ns.query), nums=ns.nums))))
 
 def main():
     parser = argparse.ArgumentParser(prog="nerconesearch")

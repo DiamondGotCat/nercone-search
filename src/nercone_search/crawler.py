@@ -56,7 +56,7 @@ def crawl(url: str, recursive: bool = True, disallow_ok: bool = True, already_cr
                     keywords_text = keywords_tag["content"].strip() if keywords_tag and keywords_tag.has_attr("content") else ""
                     keywords = list(map(str.strip, keywords_text.split(",")))
                     append(url=url, title=title, description=description, markdown=content_md, keywords=keywords, tensor=embed(f"Title: {title}\nDescription: {description}\nKeywords: {', '.join(keywords)}\n\n{content_md}"))
-                    logger.log(f"Crawled {title}('{url}')")
+                    logger.log(f"Crawled {title} ('{url}')")
                     if recursive:
                         links = []
                         for a in bs.find_all("a", href=True):
